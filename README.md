@@ -63,7 +63,7 @@ objdbg>
 
 **attr**：列出object中的所有属性。
 
-
+![1746365505015.png](https://img.picui.cn/free/2025/05/04/68176c429da05.png)
 
 **pickle**：输出pickle.dumps(obj)并进行base64编码。  
 
@@ -73,7 +73,13 @@ objdbg>
 
 ![1746020496532.png](https://img.picui.cn/free/2025/04/30/681228941b2f5.png)
 
-**TODO** **func {funcname} {arg1} {arg2} ......**：调用object内的函数，输出返回值。  
+**dir {obj.xxx}**：打印dir(obj.xxx)，假如不传参默认dir(obj)
+
+![1746365084603.png](https://img.picui.cn/free/2025/05/04/68176a9e513e2.png)
+
+**func {funcname} {arg1} {arg2} ......**：调用object内的函数，输出返回值。  
+
+![1746365587646.png](https://img.picui.cn/free/2025/05/04/68176c952a266.png)
 
 **TODO** **note**：快速列出object中比较值得注意的信息。（eg：被修改的魔术方法）  
 
@@ -129,15 +135,17 @@ n = dbg(A)
 
 **TODO** **mod_func {funcname} {base64_code}**：修改&新建object的特定方法（将代码base64编码后传入）。  
 
-# 安装
+## 其他
 
-> 由于objdbg的基础功能尚未完成，故还没有上线pypi。目前仅是公布源码，还不能投入使用。
+**help**：打印帮助信息
+
+![1746365894752.png](https://img.picui.cn/free/2025/05/04/68176dc9ae822.png)
+
+# 安装
 
 ```
 pip install objdbg
 ```
-
-
 
 # 协议
 

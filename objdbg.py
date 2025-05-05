@@ -4,18 +4,20 @@
 @Time    :   2025/04/30 12:45:40
 @Author  :   LamentXU 
 '''
+import inspect
+
 from objprint import op
 from rich.console import Console 
 from rich.table import Table
 from code import interact
 from types import FunctionType
 from pickle import dumps
+from rich.markdown import Markdown
 from copy import deepcopy
-from base64 import b64decode, b64encode
+from base64 import b64encode
 from functools import partial
-import inspect
 from typing import Any, Dict
-VERSION = '0.1.1'
+VERSION = '0.1.2'
 banner = '''
 [bold]python [red]OBJ[/red]ect [red]D[/red]e[red]B[/red]u[red]G[/red]ger ([strong][red]OBJDBG[/strong][/red]) v''' + VERSION + '[/bold]\n'
 csle = Console()
@@ -71,17 +73,23 @@ def get_object_attributes(obj):
     """
     获取对象的所有实例属性（不包括方法）
     
-    参数：要检查的Python对象
+    参数：
+        object obj: 要检查的Python对象
 
     返回:
         字典，键为属性名，值为属性内容
+        False, 如果Object不含有__dict__
     
     """
-    return {
-        key: value 
-        for key, value in vars(obj).items()
-        if not callable(value) and not key.startswith('__')
-    }
+    try:
+        return {
+            key: value 
+            for key, value in vars(obj).items()
+            if not callable(value) and not key.startswith('__')
+        }
+    except TypeError:
+        csle.print('Object does not have __dict__ attribute.')
+        return False
 
 def get_methods_info(obj: Any) -> Dict[str, Dict[str, Any]]:
     """
@@ -126,15 +134,14 @@ def get_methods_info(obj: Any) -> Dict[str, Dict[str, Any]]:
                 
     return methods_info
 
-def print_methods_table(obj: Any, title: str = "Methods Information"):
+def print_methods_table(methods_info: Dict, title: str = "Methods Information"):
     """
     使用Rich表格打印对象的方法信息
     
     参数:
-        obj: 要检查的Python对象
+        methods_info: 字典，为get_methods_info的返回值
         title: 表格标题
     """
-    methods_info = get_methods_info(obj)
     console = Console()
 
     table = Table(title=title, show_header=True, header_style="bold magenta", show_lines=True)
@@ -176,6 +183,23 @@ def arg_prase_to_object(arg: str) -> object:
     except NameError:
         print('[!] arg '+ arg + ' undefined. assuming it "' + arg + '"')
         return '"'+str(arg)+'"'
+def format_return(obj: Any) -> str:
+    """
+    将函数的返回值转化为字符串
+    
+    参数：
+        object obj：返回值
+    返回：
+        str formatstring：可输出的字符串
+    """
+
+    try:
+        ret = str(obj)
+    except:
+        ret = op.objstr(obj)
+        if not ret:
+            ret = '[Unprintable]'
+    return ret
 def dbg(obj: Any) -> object:
     """
     调试对象
@@ -219,14 +243,100 @@ def dbg(obj: Any) -> object:
                 except:
                     pass
             elif cmd == 'attr':
-                csle.print_json(data=get_object_attributes(obj))
+                _ = get_object_attributes(obj)
+                if _:
+                    csle.print_json(data=_)
+                elif _ == False:
+                    pass
+                else:
+                    csle.print('[*] Object has no attributes')
+            elif cmd == 'help':
+                csle.print(banner)
+                help = Markdown('''
+
+# commands:
+
+## Static
+
+**objprint**: Lists all attributes & methods of an object. Automatically called each time dbg() is invoked.
+
+**func**: Lists all built-in functions (including overridden magic methods) in the object and their parameters.
+
+**attr**: Lists all attributes of the object.
+
+**pickle**: Outputs pickle.dumps(obj) and encodes it in base64.
+
+**obj.{attr}**: Prints the corresponding attribute of the object.
+
+**dir {obj.xxx}**: Prints dir(obj.xxx). If no argument is provided, defaults to dir(obj).
+
+**func {funcname} {arg1} {arg2} ......**: Calls a function within the object and outputs the return value.
+
+**TODO note**: Quickly lists noteworthy information about the object (e.g., modified magic methods).
+
+......
+
+## Dynamic
+
+**shell**: Switches to the Python interactive shell. The local namespace contains the object being debugged.
+
+**mod_attr** {attrname} {new_value}: Modifies a specific attribute within the object. Supports various nested structures like tuples, lists, and dictionaries.
+
+**reset**: Restores the object in the debugger to its initial state when first passed into the debugger.
+
+**retr**: Stops debugging and returns the object from the debugger.
+
+**exit&quit**: Stops debugging and returns None.
+
+```
+from objdbg import dbg
+class A():
+    def __init__(self):
+        self.s = 1
+    def __eq__(self):
+        return False
+
+    @staticmethod
+    def staticadd(b, v):
+        return b + v
+    @classmethod
+    def classadd(self, c, b=1, v=2):
+        return b + v + c
+    def add(self, a, b, c, *args, **kargs):
+        return a + b + c
+n = dbg(A)
+# if retr: n == A_that_is_modified_in_debugger
+# if exit&quit: n == None
+```
+
+**del attr {attrname}**: Deletes a specific attribute within the object.
+
+**del func {funcname}**: Disables a specific method in the object.
+
+> Note: Since methods cannot be directly deleted from an instance in Python, when you attempt to del a method, objdbg will set it to None, making it non-callable. However, the attribute itself will not be removed.
+
+**TODO mod_func {funcname} {base64_code}**: Modifies or creates a specific method in the object (pass the code encoded in base64).
+
+''')
+                csle.print(help)
+            elif cmd.startswith('dir'):
+                cmd = cmd.split()
+                if len(cmd) == 1:
+                    csle.print_json(data=dir(obj))
+                elif len(cmd) == 2:
+                    obj = eval(cmd[-1])
+                    csle.print_json(data=dir(obj))
+                    print('[*] ' + cmd[-1] + ' returns ' + format_return(obj) + '. The dir() result is as above.')
+                else:
+                    csle.print('[-] Parameters error, command format: dir {obj.xxx}')
+
             elif cmd.startswith('obj.'):
-                # csle.print(eval(cmd)) 其实就可以但是我不想 :(
-                attr = ''.join(cmd.split('.')[1:])
                 try:
-                    csle.print('[*] ' + str(getattr(obj, attr)))
+                    # attr = ''.join(cmd.split('.')[1:])
+                    # csle.print('[*] ' + str(getattr(obj, attr)))
+                    csle.print(eval(cmd))
                 except AttributeError:
-                    csle.print(f'[-] This obj has no attribute {attr}')
+                    csle.print('[-] This obj has no attribute {attr}')
             elif cmd.startswith('mod_attr'):
                 args = None if len(cmd.split()) < 3 else cmd.split()[1:]
                 if args:
@@ -268,24 +378,31 @@ def dbg(obj: Any) -> object:
                 args = None if len(cmd.split()) == 1 else cmd.split()[1:]
                 if args:
                     funcname = args[0]
-                    func = getattr(obj, funcname)
+                    try:
+                        func = eval(funcname)
+                    except AttributeError:
+                        print('[-] Object has no function ' + '.'.join(funcname.split('.')[1:]))
+                        continue
                     if callable(func):
                         args = [arg_prase_to_object(x) for x in args[1:]]
                         try:
                             a = partial(func, *args)()
-                            try:
-                                ret = str(a)
-                            except:
-                                ret = op.objstr(a)
+                            ret = format_return(a)
                             csle.print('Function ' + funcname + ' executed. returned [red][strong]' + ret + '[/red][/strong]')
                         except Exception as e:
                             csle.print('[-] An error occurred when calling func '+funcname + ': ' + str(e))
                     else:
                         csle.print('[-] Attribute '+funcname+' is not callable, type "func" to see all functions in the object')
                 else:
-                    print_methods_table(obj)
+                    _ = get_methods_info(obj)
+                    if _:
+                        print_methods_table(obj)
+                    else:
+                        csle.print('[*] Object has no functions')
+            elif not cmd:
+                continue
             else:
-                csle.print('[-] no command "' + cmd + '" found.')
+                csle.print('[-] no command "' + cmd + '" found. Type "help" for help')
         except KeyboardInterrupt:
             csle.print('\n[*] KeyboardInterrupt detected. Exit with no returns.')
             return None
