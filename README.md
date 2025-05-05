@@ -1,11 +1,17 @@
 <h1 align="center">objdbg：一款专注于python object的调试器</h1>
 <p align="center">
-<img src=https://img.shields.io/badge/python-3-blue?style=for-the-badge>
+<img src=https://img.shields.io/badge/python-3.9+-blue?style=for-the-badge>
 <img src=https://img.shields.io/badge/License-Apache2.0-green?style=for-the-badge>
 <img src=https://img.shields.io/badge/State-Developing-red?style=for-the-badge>
 <em><h5 align="center"></h5></em>
 
->objdbg目前尚处于开发阶段。功能尚不完整。
+> English version of README [here](https://github.com/LamentXU123/objdbg/blob/main/README_english.md)
+
+# 安装
+
+```bash
+pip install objdbg
+```
 
 # 简介
 ## 什么？
@@ -140,12 +146,6 @@ n = dbg(A)
 **help**：打印帮助信息
 
 ![1746365894752.png](https://github.com/LamentXU123/picx-images-hosting/raw/master/image.6m441pv836.png)
-
-# 安装
-
-```bash
-pip install objdbg
-```
 
 # 协议
 
