@@ -88,7 +88,7 @@ def get_object_attributes(obj):
             if not callable(value) and not key.startswith('__')
         }
     except TypeError:
-        csle.print('Object does not have __dict__ attribute.')
+        csle.print('[*] Object does not have __dict__ attribute.')
         return False
 
 def get_methods_info(obj: Any) -> Dict[str, Dict[str, Any]]:
