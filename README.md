@@ -12,7 +12,7 @@
 objdbg是一款专门用于python object的调试器。它可以使你轻松地在交互式的shell中对一个特定的python object进行静态和动态的分析。
 ## 等等，什么？？？
 假设存在如下object：
-```
+```python
 class A():
     def __init__(self):
         self.s = 1
@@ -29,12 +29,12 @@ class A():
         return a + b + c
 ```
 我们可以使用objdbg对其进行调试，如下：
-```
+```python
 from objdbg import dbg
 dbg(A())
 ```
 就会弹出如下交互式的shell。
-```
+```bash
 python OBJect DeBuGger (OBJDBG) v0.1
 
 [*] Details of the object (command "objprint"):
@@ -104,7 +104,7 @@ objdbg>
 
 **exit&quit**：停止调试，返回None。  
 
-```
+```python
 from objdbg import dbg
 class A():
     def __init__(self):
@@ -143,7 +143,7 @@ n = dbg(A)
 
 # 安装
 
-```
+```bash
 pip install objdbg
 ```
 
