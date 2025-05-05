@@ -63,7 +63,7 @@ objdbg>
 
 **attr**：列出object中的所有属性。
 
-![1746365505015.png](https://img.picui.cn/free/2025/05/04/68176c429da05.png)
+![1746365505015.png](https://github.com/LamentXU123/picx-images-hosting/raw/master/image.7snfab9ai0.png)
 
 **pickle**：输出pickle.dumps(obj)并进行base64编码。  
 
@@ -75,7 +75,7 @@ objdbg>
 
 **dir {obj.xxx}**：打印dir(obj.xxx)，假如不传参默认dir(obj)
 
-![1746365084603.png](https://img.picui.cn/free/2025/05/04/68176a9e513e2.png)
+![1746365084603.png](https://github.com/LamentXU123/picx-images-hosting/raw/master/image.4ub56t236u.png)
 
 **func {funcname} {arg1} {arg2} ......**：调用object内的函数，输出返回值。  
 
