@@ -131,7 +131,6 @@ def get_methods_info(obj: Any) -> Dict[str, Dict[str, Any]]:
                 
             except (ValueError, TypeError):
                 continue
-                
     return methods_info
 
 def print_methods_table(methods_info: Dict, title: str = "Methods Information"):
@@ -149,7 +148,6 @@ def print_methods_table(methods_info: Dict, title: str = "Methods Information"):
     table.add_column("Return Type", style="green")
     table.add_column("Parameters", style="blue")
     table.add_column("Docstring", style="yellow")
-
     for method_name, info in methods_info.items():
         param_lines = []
         for param in info['parameters']:
@@ -251,6 +249,8 @@ def dbg(obj: Any) -> object:
                 obj = deepcopy(original_obj)
             elif cmd == 'pickle':
                 csle.print('[*] The pickled data is: '+b64encode(dumps(obj)).decode())
+            elif cmd == 'version':
+                csle.print('[*] objprint version: ' + VERSION)
             elif cmd == 'shell':
                 try:
                     interact(local=locals())
@@ -338,9 +338,9 @@ n = dbg(A)
                 if len(cmd) == 1:
                     csle.print_json(data=dir(obj))
                 elif len(cmd) == 2:
-                    obj = eval(cmd[-1])
-                    csle.print_json(data=dir(obj))
-                    print('[*] ' + cmd[-1] + ' returns ' + format_return(obj) + '. The dir() result is as above.')
+                    _obj = eval(cmd[-1])
+                    csle.print_json(data=dir(_obj))
+                    print('[*] ' + cmd[-1] + ' returns ' + format_return(_obj) + '. The dir() result is as above.')
                 else:
                     csle.print('[-] Parameters error, command format: dir {obj.xxx}')
 
@@ -350,7 +350,7 @@ n = dbg(A)
                     # csle.print('[*] ' + str(getattr(obj, attr)))
                     csle.print(eval(cmd))
                 except AttributeError:
-                    csle.print('[-] This obj has no attribute {attr}')
+                    csle.print(f'[-] This obj has no attribute {cmd}')
             elif cmd.startswith('mod_attr'):
                 args = None if len(cmd.split()) < 3 else cmd.split()[1:]
                 if args:
@@ -394,7 +394,7 @@ n = dbg(A)
                 args = None if len(cmd.split()) == 1 else cmd.split()[1:]
                 if args:
                     if not args[0].startswith('obj.'):
-                        csle.print('[!] Changing function name from '+args[1] +' to obj.' + args[0])
+                        csle.print('[!] Changing function name from '+args[0] +' to obj.' + args[0])
                         args[0] = 'obj.'+args[0]
                     funcname = args[0]
                     try:
@@ -415,7 +415,7 @@ n = dbg(A)
                 else:
                     _ = get_methods_info(obj)
                     if _:
-                        print_methods_table(obj)
+                        print_methods_table(_)
                     else:
                         csle.print('[*] Object has no functions')
             elif not cmd:

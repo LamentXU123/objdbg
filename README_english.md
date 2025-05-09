@@ -5,12 +5,13 @@
 <img src=https://img.shields.io/badge/State-Developing-red?style=for-the-badge>
 <em><h5 align="center"></h5></em>
 
+> [here](https://github.com/LamentXU123/objdbg/blob/main/README_english.md)
+
 # Install
 
 ```bash
 pip install objdbg
 ```
-
 
 # Introduction
 ## What?
@@ -145,6 +146,8 @@ n = dbg(A)
 **help**: Print help information
 
 ![1746365894752.png](https://github.com/LamentXU123/picx-images-hosting/raw/master/image.6m441pv836.png)
+
+**version**：Print version information
 
 # protocol
 

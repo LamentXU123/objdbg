@@ -147,6 +147,8 @@ n = dbg(A)
 
 ![1746365894752.png](https://github.com/LamentXU123/picx-images-hosting/raw/master/image.6m441pv836.png)
 
+**version**：打印版本信息
+
 # 协议
 
 objdbg项目基于Apache Lisence 2.0。
